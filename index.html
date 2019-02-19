@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>To-Do List App</title>
+	<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+	<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+	<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<style>
+	span{
+		color: red;
+		border: 2px solid red;
+		border-radius: 3px;
+		font-size: 20px;
+	}
+	#page{
+		margin: 100px;
+	}
+	body{
+		background-color:#F0F8FF;
+		font-size: 25px;
+	}
+	#box{
+		width: 600px;
+		font-size: 25px;
+	}
+	#todoitem{
+		border: 2px hidden;
+		border-bottom: 3px solid grey;
+		background-color: lightgrey;
+	}
+	li{
+		width: 600px;
+		font-size: 25px;
+	}
+	button{
+		font-size: 28px;
+	}
+	h1{
+		border-bottom: 10px solid #00008B;
+		background-color: #D3D3D3;
+		text-align: center;
+	}
+</style>
+</head>
+
+<body>
+	<h1>To-Do List For Today</h1>
+	<div id="container"></div>
+	<script type="text/babel">
+	
+	
+	class ReactApp extends React.Component {
+    
+	constructor(props){
+		super(props);
+		
+		
+		this.state = {
+			items: [{text:"Laundry Clothes",key:"1"},{text:"Feed the dog",key:"2"},{text:"Email the Boss for Resignation",key:"3"},{text:"Find new Job",key:"4"}]
+		};
+		
+		
+		this.addList = this.addList.bind(this);
+		this.deleteSelection = this.deleteSelection.bind(this);
+	}
+	
+	addList(e){
+		if(this._inputElement.value !== ""){
+			var newThing = {
+				text: this._inputElement.value,
+				key: Date.now()
+			};
+			
+			this.setState((prevState) => {
+				return{
+					items: prevState.items.concat(newThing)
+				};
+			});
+		}
+		this._inputElement.value = "";
+		e.preventDefault(); 
+	}
+	
+	deleteSelection(key){
+		var fselectItem = this.state.items.filter(function (item){
+			return (item.key !== key)
+		});
+		
+		this.setState({
+			items: fselectItem
+		});
+	}
+	
+    render() {
+        return(
+            <div id="page">
+				<div>
+					<form onSubmit={this.addList}>
+						<input id="box" ref={(a) => this._inputElement = a} 
+								placeholder="Enter a task for the Day">
+						</input>
+						<button type="submit">Add</button>
+					</form>
+				</div>
+				<ToDoThings entries={this.state.items} 
+				delete={this.deleteSelection}/>
+			</div>
+        );
+    }
+	
+	
+	
+	}
+	
+	class ToDoThings extends React.Component{
+	
+		constructor(props){
+			super(props);
+			this.createThings = this.createThings.bind(this);
+		}
+		
+		createThings(item){
+			return <li id="todoitem" key={item.key}>{item.text} <span onClick={() => this.delete(item.key)}>  Delete</span> </li>
+		}
+		
+		delete(key){
+			this.props.delete(key);
+		}
+		
+		render(){
+			var listentry = this.props.entries;
+			var itemsList = listentry.map(this.createThings);
+			
+			return(
+				<ul>
+					{itemsList}
+				</ul>
+			);
+		}
+	}
+	
+	ReactDOM.render(<ReactApp/>, 
+					document.querySelector("#container"));
+	</script>
+</body>
+</html>
